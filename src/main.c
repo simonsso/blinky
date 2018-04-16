@@ -88,7 +88,8 @@ main(int argc, char* argv[])
   // 01 output
   // 10 alternativ function
   // 11 Analog
-  GPIOA->MODER = (GPIOA->MODER & 0xFFFF03FF) | 0x00005400 ;
+  GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000) | 0x00005555 ;
+  GPIOB->MODER = (GPIOB->MODER & 0xFFFF0000) | 0x00005555 ;
 
   // see GPIO_TypeDef
   uint32_t seconds = 0;
@@ -108,7 +109,18 @@ main(int argc, char* argv[])
       GPIOA->BSRR=0x00000080;
       GPIOA->BSRR=0x00000040;
 #else
-      GPIOA->ODR = seconds << 5;
+      GPIOB->ODR = 0x55;
+      GPIOA->ODR = 0x55;
+      GPIOA->ODR = 0xaa;
+      GPIOA->ODR = 0x0f;
+      GPIOA->ODR = 0xf0;
+
+      GPIOB->ODR = 0xAA;
+      GPIOA->ODR = 0x55;
+      GPIOA->ODR = 0xaa;
+      GPIOA->ODR = 0x0f;
+      GPIOA->ODR = 0xf0;
+
 #endif
       ++seconds;
 
