@@ -32,7 +32,7 @@
 #include "diag/Trace.h"
 
 #include "Timer.h"
-#include "BlinkLed.h"
+//#include "BlinkLed.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -52,11 +52,6 @@
 // (currently OS_USE_TRACE_ITM, OS_USE_TRACE_SEMIHOSTING_DEBUG/_STDOUT).
 //
 
-// ----- Timing definitions -------------------------------------------------
-
-// Keep the LED on for 2/3 of a second.
-#define BLINK_ON_TICKS  (TIMER_FREQUENCY_HZ * 3 / 4)
-#define BLINK_OFF_TICKS (TIMER_FREQUENCY_HZ - BLINK_ON_TICKS)
 
 // ----- main() ---------------------------------------------------------------
 
@@ -67,18 +62,32 @@
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
-int
-main(int argc, char* argv[])
+void showline(int line,uint8_t *bitmap ){
+#define WAITTICK 1
+	if (line == 7 ){
+		  // Line 7 is on GPIO C bit 1
+	      GPIOC->ODR = 2;
+	      GPIOB->ODR = 0;
+	}else {
+	      GPIOC->ODR = 0;
+	      GPIOB->ODR = 1<<line;
+	}
+	      GPIOA->ODR = 0 + bitmap[line];
+	      timer_sleep( WAITTICK);
+}
+int main(int argc, char* argv[])
 {
-  uint8_t bitmap[8] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa };
+  uint8_t bitmap[8] = {0x66,0x99,0x81,0xc3,0xc3,0x66,0x3c,0x18 };  //Heart
 
 
-  // timer_start();
+  timer_start();
+  uint32_t seconds = 0;
+  volatile int x=0;
   // Enable GPIO Peripheral clock
   /* GPIOC Periph clock enable */
-  RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN |RCC_AHB1ENR_GPIOBEN );
+  RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN |RCC_AHB1ENR_GPIOBEN |RCC_AHB1ENR_GPIOCEN );
 
-  // Set up direction for GPIOA
+  // Set up direction for GPIOA B C
   // Each gpio bit have 2 control bits
   // 00 input
   // 01 output
@@ -86,45 +95,16 @@ main(int argc, char* argv[])
   // 11 Analog
   GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000) | 0x00005555 ;
   GPIOB->MODER = (GPIOB->MODER & 0xFFFF0000) | 0x00005555 ;
+  GPIOC->MODER = (GPIOC->MODER & 0xFFFFFFF3) | 0x00000004 ;
 
-
-  uint32_t seconds = 0;
 
   // Infinite loop
   while (1)
     {
-#if 0
-  //    blink_led_off();
-      GPIOA->BSRR=0x00200000;
-      GPIOA->BSRR=0x00400000;
-      GPIOA->BSRR=0x00800000;
-
-
-//      blink_led_on();
-      GPIOA->BSRR=0x00000020;
-      GPIOA->BSRR=0x00000080;
-      GPIOA->BSRR=0x00000040;
-#else
-
-      GPIOB->ODR = 1;
-      GPIOA->ODR = 0 + bitmap[1];
-      GPIOB->ODR = 2;
-      GPIOA->ODR = 0 + bitmap[2];
-      GPIOB->ODR = 4;
-      GPIOA->ODR = 0 + bitmap[2];
-      GPIOB->ODR = 4;
-      GPIOB->ODR = 8;
-      GPIOB->ODR = 0x10;
-      GPIOB->ODR = 0x20;
-      GPIOB->ODR = 0x40;
-      GPIOB->ODR = 0x80;
-
-
-#endif
-      ++seconds;
-
+	   showline(x&7,bitmap);
+	   x++;
     }
-  // Infinite loop, never return.
+    ++seconds;
 }
 
 #pragma GCC diagnostic pop
