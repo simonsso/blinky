@@ -70,17 +70,13 @@
 int
 main(int argc, char* argv[])
 {
-  // Send a greeting to the trace device (skipped on Release).
-  trace_puts("Hello ARM World!");
+  uint8_t bitmap[8] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa };
 
-  // At this stage the system clock should have already been configured
-  // at high speed.
- // trace_printf("System clock: %u Hz\n", SystemCoreClock);
 
- // timer_start();
+  // timer_start();
   // Enable GPIO Peripheral clock
   /* GPIOC Periph clock enable */
-  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+  RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN |RCC_AHB1ENR_GPIOBEN );
 
   // Set up direction for GPIOA
   // Each gpio bit have 2 control bits
@@ -91,7 +87,7 @@ main(int argc, char* argv[])
   GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000) | 0x00005555 ;
   GPIOB->MODER = (GPIOB->MODER & 0xFFFF0000) | 0x00005555 ;
 
-  // see GPIO_TypeDef
+
   uint32_t seconds = 0;
 
   // Infinite loop
@@ -109,17 +105,20 @@ main(int argc, char* argv[])
       GPIOA->BSRR=0x00000080;
       GPIOA->BSRR=0x00000040;
 #else
-      GPIOB->ODR = 0x55;
-      GPIOA->ODR = 0x55;
-      GPIOA->ODR = 0xaa;
-      GPIOA->ODR = 0x0f;
-      GPIOA->ODR = 0xf0;
 
-      GPIOB->ODR = 0xAA;
-      GPIOA->ODR = 0x55;
-      GPIOA->ODR = 0xaa;
-      GPIOA->ODR = 0x0f;
-      GPIOA->ODR = 0xf0;
+      GPIOB->ODR = 1;
+      GPIOA->ODR = 0 + bitmap[1];
+      GPIOB->ODR = 2;
+      GPIOA->ODR = 0 + bitmap[2];
+      GPIOB->ODR = 4;
+      GPIOA->ODR = 0 + bitmap[2];
+      GPIOB->ODR = 4;
+      GPIOB->ODR = 8;
+      GPIOB->ODR = 0x10;
+      GPIOB->ODR = 0x20;
+      GPIOB->ODR = 0x40;
+      GPIOB->ODR = 0x80;
+
 
 #endif
       ++seconds;
