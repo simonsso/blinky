@@ -23,8 +23,12 @@ void showline(int line,uint8_t *bitmap ){
 	      timer_sleep( WAITTICK);
 }
 int main(int argc, char* argv[]) {
-  uint8_t bitmap[8] = {0x66,0x99,0x81,0xc3,0xc3,0x66,0x3c,0x18 };  //Heart
-
+  uint8_t bitmap[] = {0x66,0x99,0x81,0xc3,0xc3,0x66,0x3c,0x18,  //Heart
+		              0x60,0x02,0x62,0x04,0x08,0x10,0x60,0x00,  //katakana shi
+					  0x3c,0x10,0x10,0x7e,0x10,0x10,0x0c,0x00,  //katakana mo
+		              0x00,0x00,0x60,0x64,0x04,0x04,0x78,0x00,  //katakana n
+		              0x00,0x44,0x44,0x24,0x04,0x18,0x00,0x00,  //katakana so
+                     };
 
   timer_start();
   (void) argc;
@@ -47,11 +51,18 @@ int main(int argc, char* argv[]) {
   GPIOC->MODER = (GPIOC->MODER & 0xFFFFFFF3) | 0x00000004 ;
 
 
-  // Infinite loop
-  while (1)
-    {
-	   showline(x&7,bitmap);
-	   x++;
+   // Infinite loop
+   volatile int i=1;
+   while (1){
+      showline(x&7,&bitmap[8*i]);
+      x++;
+      if( x == 2000 ){
+    	  i++;
+    	  x=0;
+    	  if(i == 5 ){
+    		  i= 0;
+    	  }
+      }
     }
     ++seconds;
 }
