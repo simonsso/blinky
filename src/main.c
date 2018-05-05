@@ -23,11 +23,19 @@ void showline(int line,uint8_t *bitmap ){
 	      timer_sleep( WAITTICK);
 }
 int main(int argc, char* argv[]) {
+#define C_HEART 0
+#define C_SHI 1
+#define C_MO  2
+#define C_N   3
+#define C_SO  4
+#define C_STAR 5
+  int msg[] = {C_SHI,C_MO,C_N,C_SO,C_N,C_HEART,C_STAR,C_HEART,-1};
   uint8_t bitmap[] = {0x66,0x99,0x81,0xc3,0xc3,0x66,0x3c,0x18,  //Heart
 		              0x60,0x02,0x62,0x04,0x08,0x10,0x60,0x00,  //katakana shi
 					  0x3c,0x10,0x10,0x7e,0x10,0x10,0x0c,0x00,  //katakana mo
 		              0x00,0x00,0x60,0x64,0x04,0x04,0x78,0x00,  //katakana n
 		              0x00,0x44,0x44,0x24,0x04,0x18,0x00,0x00,  //katakana so
+					  0x00,0x00,0x66,0x18,0x18,0x66,0x00,0x00	//star
                      };
 
   timer_start();
@@ -52,15 +60,19 @@ int main(int argc, char* argv[]) {
 
 
    // Infinite loop
-   volatile int i=1;
+   volatile int i=0;
+   int cindex=msg[0];
    while (1){
-      showline(x&7,&bitmap[8*i]);
+      showline(x&7,&bitmap[8*cindex]);
       x++;
       if( x == 2000 ){
     	  i++;
+    	  cindex=msg[i];
+
     	  x=0;
-    	  if(i == 5 ){
-    		  i= 0;
+    	  if(cindex == -1 ){
+    		  i=0;
+    		  cindex=msg[0];
     	  }
       }
     }
