@@ -27,6 +27,9 @@ int main(int argc, char* argv[]) {
 
 
   timer_start();
+  (void) argc;
+  (void) argv;
+
   uint32_t seconds = 0;
   volatile int x=0;
   // Enable GPIO Peripheral clock
@@ -34,11 +37,11 @@ int main(int argc, char* argv[]) {
   RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN |RCC_AHB1ENR_GPIOBEN |RCC_AHB1ENR_GPIOCEN );
 
   // Set up direction for GPIOA B C
-  // Each gpio bit have 2 control bits
+  // Each GPIO bit have 2 control bits
   // 00 input
   // 01 output
-  // 10 alternativ function
-  // 11 Analog
+  // 10 alternative function
+  // 11 Analogue
   GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000) | 0x00005555 ;
   GPIOB->MODER = (GPIOB->MODER & 0xFFFF0000) | 0x00005555 ;
   GPIOC->MODER = (GPIOC->MODER & 0xFFFFFFF3) | 0x00000004 ;
