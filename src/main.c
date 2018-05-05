@@ -19,7 +19,7 @@ void showline(int line,uint8_t *bitmap ){
 	      GPIOC->ODR = 0;
 	      GPIOB->ODR = 1<<line;
 	}
-	      GPIOA->ODR = 0 + bitmap[line];
+	      GPIOA->ODR = 0 + *bitmap;
 	      timer_sleep( WAITTICK);
 }
 int main(int argc, char* argv[]) {
@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
   (void) argc;
   (void) argv;
 
-  uint32_t seconds = 0;
   volatile int x=0;
   // Enable GPIO Peripheral clock
   /* GPIOC Periph clock enable */
@@ -58,23 +57,25 @@ int main(int argc, char* argv[]) {
   GPIOB->MODER = (GPIOB->MODER & 0xFFFF0000) | 0x00005555 ;
   GPIOC->MODER = (GPIOC->MODER & 0xFFFFFFF3) | 0x00000004 ;
 
-
+  volatile int i=0;
    // Infinite loop
-   volatile int i=0;
-   int cindex=msg[0];
-   while (1){
-      showline(x&7,&bitmap[8*cindex]);
-      x++;
-      if( x == 2000 ){
-    	  i++;
-    	  cindex=msg[i];
+   while(1){
 
+      for(int vbl=0;vbl<8;vbl++){
+    	  uint32_t cindex=((i+vbl)&~7)/8;
+    	  int line = ((i+vbl)&7);
+    	  if(msg[cindex] == -1 ){
+    		  cindex=0;
+    	  }
+    	  showline(vbl&7,&bitmap[(8*msg[cindex])+line]);
+	  }
+      x++;
+      if( x== 20){
+          i++;
     	  x=0;
-    	  if(cindex == -1 ){
+    	  if(msg[i/8] == -1 ){
     		  i=0;
-    		  cindex=msg[0];
     	  }
       }
     }
-    ++seconds;
 }
